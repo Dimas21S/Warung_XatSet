@@ -30,6 +30,16 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-2 pt-5">Selamat Datang 👋</h2>
             <p class="text-gray-500 mb-8">Silakan login untuk melanjutkan</p>
 
+            @if ($errors->any())
+                <div class="bg-red-100 text-red-700 p-3 rounded-lg mb-4">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>• {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('login.post') }}" method="POST">
                 @csrf
                 <div class="space-y-5">
