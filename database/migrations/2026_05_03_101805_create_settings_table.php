@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('logo')->nullable();
             $table->string('no_cs')->nullable();
             $table->text('alamat')->nullable();
+            $table->text('facebook')->nullable();
+            $table->text('instagram')->nullable();
+            $table->text('twitter')->nullable();
+            $table->text('whatsapp')->nullable();
 
             $table->foreignId('outlet_id')
             ->nullable()

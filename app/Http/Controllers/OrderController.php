@@ -62,13 +62,23 @@ class OrderController extends Controller
     public function hapusItem(Request $request)
     {
         $cart = session('cart', []);
-        unset($cart[$request->index]);
-        $cart = array_values($cart);
-        session(['cart' => $cart]);
+
+        if (isset($cart[$request->index])) {
+
+            unset($cart[$request->index]);
+
+            $cart = array_values($cart);
+
+            session(['cart' => $cart]);
+        }
+
+        $total = collect($cart)->sum(function ($item) {
+            return $item['harga'] * $item['qty'];
+        });
 
         return response()->json([
-            'status' => 'hapus',
-            'total'  => collect(session('cart'))->sum(fn($item) => $item['harga'] * $item['qty'])
+            'status' => 'success',
+            'total'  => $total
         ]);
     }
 
@@ -219,7 +229,7 @@ class OrderController extends Controller
         // Kosongkan cart
         session()->forget('cart');
 
-        return redirect()->route('user.selesai', $order->id);
+        return redirect()->route('beranda', $order->id);
     }
 
 }

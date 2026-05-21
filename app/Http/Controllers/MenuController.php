@@ -29,7 +29,6 @@ class MenuController extends Controller
 
         $menu = Menu::findOrFail($request->menu_id);
 
-        // Cek ketersediaan menu
         if (!$menu->is_available) {
             return response()->json([
                 'status'  => 'error',
@@ -39,7 +38,6 @@ class MenuController extends Controller
 
         $cart = session('cart', []);
 
-        // Cek apakah menu sudah ada di cart
         foreach ($cart as $item) {
             if ($item['menu_id'] == $request->menu_id) {
                 return response()->json([
@@ -49,7 +47,6 @@ class MenuController extends Controller
             }
         }
 
-        // Tambah item baru ke cart
         $cart[] = [
             'menu_id' => $request->menu_id,
             'nama'    => $menu->nama_menu,
@@ -61,8 +58,63 @@ class MenuController extends Controller
 
         return response()->json([
             'status'  => 'success',
-            'message' => "Menu '{$menu->nama_menu}' berhasil ditambahkan ke keranjang!"
+            'message' => "Menu '{$menu->nama_menu}' berhasil ditambahkan!",
+            'qty'     => 1,           // ← tambah ini
+            'menu_id' => $request->menu_id  // ← tambah ini
         ]);
+    }
+
+        // Tambah qty
+    public function tambahQty(Request $request)
+    {
+        $cart = session('cart', []);
+
+        foreach ($cart as $index => $item) {
+            if ($item['menu_id'] == $request->menu_id) {
+                $cart[$index]['qty']++;
+                session(['cart' => $cart]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'qty'    => $cart[$index]['qty'],
+                    'total'  => collect(session('cart'))->sum(fn($item) => $item['harga'] * $item['qty'])
+                ]);
+            }
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Item tidak ditemukan']);
+    }
+
+    // Kurang qty
+    public function kurangQty(Request $request)
+    {
+        $cart = session('cart', []);
+
+        foreach ($cart as $index => $item) {
+            if ($item['menu_id'] == $request->menu_id) {
+                if ($cart[$index]['qty'] > 1) {
+                    $cart[$index]['qty']--;
+                    session(['cart' => $cart]);
+
+                    return response()->json([
+                        'status' => 'success',
+                        'qty'    => $cart[$index]['qty'],
+                        'total'  => collect(session('cart'))->sum(fn($item) => $item['harga'] * $item['qty'])
+                    ]);
+                } else {
+                    unset($cart[$index]);
+                    $cart = array_values($cart);
+                    session(['cart' => $cart]);
+
+                    return response()->json([
+                        'status' => 'hapus',
+                        'total'  => collect(session('cart'))->sum(fn($item) => $item['harga'] * $item['qty'])
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Item tidak ditemukan']);
     }
 
     public function createProduk()

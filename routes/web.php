@@ -23,6 +23,9 @@ Route::controller(MenuController::class)->group(function () {
     Route::get('/', 'getBeranda')->name('beranda');
     Route::get('/produk', 'getProduk')->name('produk');
     Route::post('/produk', 'postProduk')->name('produk.post');
+    Route::post('produk/tambah-qty', 'tambahQty')->name('produk.tambahQTY');
+    Route::post('produk/kurang-qty', 'kurangQty')->name('produk.kurangQTY');
+
 });
 
 Route::get('/deskripsi', function () {
@@ -39,7 +42,19 @@ Route::controller(OrderController::class)->group(function () {
     Route::post('keranjang/hapus-item', 'hapusItem')->name('keranjang.hapus');
 
     Route::get('/konfirmasi', 'getKonfirmasi')->name('konfirmasi');
+    Route::post('/konfirmasi', 'postKonfirmasi')->name('konfirmasi.post');
+    // Route::get('/pesanan/sukses/{id}', [OrderController::class, 'sukses'])->name('pesanan.sukses');
 
     Route::get('/checkout', 'getCheckout')->name('checkout');
     Route::post('/checkout', 'postCheckout')->name('checkout.post');
+});
+
+Route::controller(App\Http\Controllers\AdminController::class)->group(function () {
+    Route::get('/admin/dashboard', 'dashboard')->name('admin.dashboard');
+    Route::get('/admin/pesanan', 'pesanan')->name('admin.pesanan');
+    Route::get('/admin/pengiriman', 'pengiriman')->name('admin.pengiriman');
+    Route::get('/admin/produk', 'produk')->name('admin.produk');
+    Route::get('/admin/keuangan', 'keuangan')->name('admin.keuangan');
+    Route::get('/admin/identitas', 'identitas')->name('admin.identitas');
+    Route::get('/admin/diskon', 'diskon')->name('admin.diskon');
 });

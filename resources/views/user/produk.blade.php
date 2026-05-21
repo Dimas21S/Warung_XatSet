@@ -10,62 +10,7 @@
 </head>
 
 <body class="">
-    <nav class="bg-[rgba(255,250,234,1)] shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <img src="{{ asset('image/Logo-Xatset.png') }}" alt="Logo" class="h-10 w-auto object-contain">
-                    <span class="ml-2 text-xl font-bold text-green-800">WarungXatSet</span>
-                </div>
-
-                <!-- Menu Desktop -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="{{ route('beranda') }}" class="text-gray-600 hover:text-green-700 font-medium transition">Beranda</a>
-                    <a href="#" class="text-gray-600 hover:text-green-700 font-medium transition">Menu</a>
-                    <a href="#" class="text-gray-600 hover:text-green-700 font-medium transition">Keranjang</a>
-                    <a href="#" class="text-gray-600 hover:text-green-700 font-medium transition">Pesanan</a>
-                    <a href="#" class="text-gray-600 hover:text-green-700 font-medium transition">Profil</a>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg font-medium transition">
-                            Logout
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Tombol Hamburger (HP) -->
-                <div class="md:hidden">
-                    <button id="hamburger" type="button" class="text-gray-600 hover:text-green-700 focus:outline-none">
-                        <svg id="icon-open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                        <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- Menu Mobile -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 pb-4">
-            <div class="flex flex-col space-y-3 pt-3">
-                <a href="{{ route('beranda') }}" class="text-gray-600 hover:text-green-700 font-medium py-2 transition">Beranda</a>
-                <a href="#" class="text-gray-600 hover:text-green-700 font-medium py-2 transition">Menu</a>
-                <a href="#" class="text-gray-600 hover:text-green-700 font-medium py-2 transition">Transaksi</a>
-                <a href="#" class="text-gray-600 hover:text-green-700 font-medium py-2 transition">Laporan</a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg font-medium transition">
-                        Logout
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    <x-navbar/>
 
     <div id="notif" class="fixed top-5 right-5 z-50 hidden px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 text-white">
     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,6 +52,18 @@
         <!-- CONTAINER SCROLL -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             @forelse ($menu as $item)
+                        @php
+                        // Cek apakah item sudah ada di cart
+                        $inCart = false;
+                        $qtyInCart = 0;
+                        foreach(session('cart', []) as $idx => $cartItem) {
+                            if($cartItem['menu_id'] == $item->id) {
+                                $inCart = true;
+                                $qtyInCart = $cartItem['qty'];
+                                break;
+                            }
+                        }
+                    @endphp
                 <!-- CARD 1 -->
                     <input type="hidden" name="menu_id" value="{{ $item->id }}">
                     <div class="bg-[#E9E3D3] p-3 md:p-4 rounded-2xl shadow-md w-48 md:w-64 flex-shrink-0">
@@ -120,11 +77,30 @@
                             IDR {{ number_format($item->harga, 0, ',', '.') }}
                         </p>
 
-                        <button class="mt-3 w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-xl text-sm md:text-base" 
-                        onclick="tambahKeranjang({{ $item->id }})">
-                            + Keranjang
-                        </button>
-                    </div>
+                        @if($inCart)
+                            {{-- Tombol − qty + --}}
+                            <div id="qty-control-{{ $item->id }}" class="mt-3 w-full flex items-center justify-between border border-yellow-600 rounded-xl overflow-hidden">
+                                <button onclick="kurangQtyProduk({{ $item->id }}, this)"
+                                        class="w-10 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-lg">
+                                    −
+                                </button>
+                                <span id="qty-produk-{{ $item->id }}" class="font-semibold text-gray-800">
+                                    {{ $qtyInCart }}
+                                </span>
+                                <button onclick="tambahQtyProduk({{ $item->id }}, this)"
+                                        class="w-10 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-lg">
+                                    +
+                                </button>
+                            </div>
+                        @else
+                            {{-- Tombol + Keranjang --}}
+                            <button id="btn-keranjang-{{ $item->id }}"
+                                    onclick="tambahKeranjang({{ $item->id }})"
+                                    class="mt-3 w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-xl text-sm md:text-base">
+                                + Keranjang
+                            </button>
+                        @endif
+                        </div>
             @empty
                 <p class="text-gray-500 col-span-full text-center">Belum ada menu tersedia.</p>
             @endforelse
@@ -203,21 +179,82 @@
     });
 </script>
 <script>
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
 function tambahKeranjang(menuId) {
     fetch('{{ route('produk.post') }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            'X-CSRF-TOKEN': csrfToken
         },
         body: JSON.stringify({ menu_id: menuId })
     })
     .then(res => res.json())
     .then(data => {
+        if (data.status === 'success') {
+            // Ganti tombol + Keranjang menjadi − qty +
+            const btn = document.getElementById(`btn-keranjang-${menuId}`);
+            btn.outerHTML = `
+                <div id="qty-control-${menuId}" class="mt-3 w-full flex items-center justify-between border border-yellow-600 rounded-xl overflow-hidden">
+                    <button onclick="kurangQtyProduk(${menuId}, this)"
+                            class="w-10 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-lg">
+                        −
+                    </button>
+                    <span id="qty-produk-${menuId}" class="font-semibold text-gray-800">1</span>
+                    <button onclick="tambahQtyProduk(${menuId}, this)"
+                            class="w-10 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-bold text-lg">
+                        +
+                    </button>
+                </div>
+            `;
+        }
         showNotif(data.message, data.status);
     })
-    .catch(() => {
-        showNotif('Terjadi kesalahan!', 'error');
+    .catch(() => showNotif('Terjadi kesalahan!', 'error'));
+}
+
+function tambahQtyProduk(menuId, btn) {
+    fetch('{{ route('produk.tambahQTY') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ menu_id: menuId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            document.getElementById(`qty-produk-${menuId}`).textContent = data.qty;
+        }
+    });
+}
+
+function kurangQtyProduk(menuId, btn) {
+    fetch('{{ route('produk.kurangQTY') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ menu_id: menuId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'hapus') {
+            // Kembalikan jadi tombol + Keranjang
+            const control = document.getElementById(`qty-control-${menuId}`);
+            control.outerHTML = `
+                <button id="btn-keranjang-${menuId}"
+                        onclick="tambahKeranjang(${menuId})"
+                        class="mt-3 w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-xl text-sm md:text-base">
+                    + Keranjang
+                </button>
+            `;
+        } else {
+            document.getElementById(`qty-produk-${menuId}`).textContent = data.qty;
+        }
     });
 }
 
@@ -226,20 +263,18 @@ function showNotif(message, status) {
     const notifMessage = document.getElementById('notif-message');
     const notifIcon = document.getElementById('notif-icon');
 
-    // Ganti warna sesuai status
     notif.classList.remove('bg-green-500', 'bg-red-500');
     if (status === 'success') {
         notif.classList.add('bg-green-500');
-        notifIcon.setAttribute('d', 'M5 13l4 4L19 7'); // icon centang
+        notifIcon.setAttribute('d', 'M5 13l4 4L19 7');
     } else {
         notif.classList.add('bg-red-500');
-        notifIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12'); // icon silang
+        notifIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
     }
 
     notifMessage.textContent = message;
     notif.classList.remove('hidden');
 
-    // Auto hilang setelah 3 detik
     setTimeout(() => {
         notif.style.transition = 'opacity 0.5s';
         notif.style.opacity = '0';

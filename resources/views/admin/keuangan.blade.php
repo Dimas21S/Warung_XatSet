@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @vite('resources/css/app.css')
+    <title>Keuangan - Warung Xat Set</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #fdf8f0; }
+        .sidebar { width: 220px; min-height: 100vh; background: #fdf8f0; border-right: 1px solid #e8e0d0; }
+        .sidebar-link { display: block; padding: 10px 24px; color: #555; font-size: 14px; text-decoration: none; border-radius: 6px; margin: 2px 8px; }
+        .sidebar-link:hover { background: #f0ebe0; color: #2d6a4f; }
+        .sidebar-link.active { color: #2d6a4f; font-weight: 600; text-decoration: underline; }
+        .topbar { background: #2d6a4f; color: white; padding: 14px 28px; font-weight: 600; font-size: 16px; }
+        .stat-card { background: #f5c842; border-radius: 10px; padding: 16px 20px; }
+    </style>
+</head>
+<body>
+
+<div class="flex">
+
+    {{-- SIDEBAR --}}
+    <div class="sidebar flex flex-col justify-between" style="position: fixed; top:0; left:0; height:100vh;">
+        <div>
+            <div class="flex items-center gap-2 px-4 py-4 border-b border-gray-200">
+                <img src="{{ asset('image/Logo-Xatset.png') }}" alt="Logo" class="h-10 w-10 rounded-full object-cover">
+                <span class="font-bold text-green-800 text-sm leading-tight">WARUNG XAT SET</span>
+            </div>
+            <nav class="mt-4">
+                <a href="{{ route('admin.dashboard') }}" class="sidebar-link">Dashboard</a>
+                <a href="#" class="sidebar-link">Pesanan</a>
+                <a href="#" class="sidebar-link">Pengiriman</a>
+                <a href="#" class="sidebar-link">Produk</a>
+                <a href="#" class="sidebar-link active">Keuangan</a>
+                <a href="#" class="sidebar-link">Identitas</a>
+                <a href="#" class="sidebar-link">Diskon</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-3 px-4 py-4 border-t border-gray-200">
+            <div class="w-9 h-9 rounded-full bg-green-800 flex items-center justify-center text-white text-sm font-bold">A</div>
+            <span class="text-sm font-medium text-gray-700">Admin</span>
+        </div>
+    </div>
+
+    {{-- MAIN --}}
+    <div class="flex-1" style="margin-left: 220px;">
+
+        {{-- Topbar --}}
+        <div class="topbar flex justify-end">
+            Keuangan
+        </div>
+
+        {{-- Content --}}
+        <div class="p-6 space-y-6">
+
+            {{-- STAT CARDS --}}
+            <div class="grid grid-cols-4 gap-4">
+                <div class="stat-card">
+                    <p class="text-xs text-yellow-800 mb-1">Total Pemasukan</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalPemasukan ?? '000' }}pcs</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs text-yellow-800 mb-1">Total Profit</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalProfit ?? '000' }}pcs</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs text-yellow-800 mb-1">Riwayat Pesanan</p>
+                    <p class="text-2xl font-bold text-gray-900">Rp{{ $riwayatPesanan ?? '000' }}jt</p>
+                </div>
+                <div class="stat-card">
+                    <p class="text-xs text-yellow-800 mb-1">Pembayaran Tertunda</p>
+                    <p class="text-2xl font-bold text-gray-900">Rp{{ $pembayaranTertunda ?? '000' }}jt</p>
+                </div>
+            </div>
+
+            {{-- CHART --}}
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        <span class="font-semibold text-gray-700">Statistika Penjualan</span>
+                    </div>
+                    <div class="flex gap-1">
+                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">−</button>
+                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">+</button>
+                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">−</button>
+                    </div>
+                </div>
+                <canvas id="chartKeuangan" height="80"></canvas>
+            </div>
+
+            {{-- FILTER --}}
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                    </svg>
+                    <span class="font-medium text-gray-700">Filter :</span>
+                </div>
+                <button class="bg-purple-200 hover:bg-purple-300 text-purple-800 px-4 py-1.5 rounded-lg text-sm font-medium transition">
+                    Pute
+                </button>
+
+                <span class="font-medium text-gray-700">Tipe Transaksi :</span>
+                <button class="bg-purple-200 hover:bg-purple-300 text-purple-800 px-4 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1">
+                    Status
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                {{-- Search --}}
+                <div class="flex-1 flex items-center bg-white border border-gray-300 rounded-lg px-3 py-1.5 gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                    </svg>
+                    <input type="text" placeholder="Cari" class="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400">
+                </div>
+            </div>
+
+            {{-- TABEL KEUANGAN --}}
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-2 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h7"/>
+                    </svg>
+                    <span class="font-semibold text-gray-700">Tabel Keuangan</span>
+                </div>
+
+                {{-- Header --}}
+                <div class="grid grid-cols-5 text-sm text-gray-500 font-medium pb-2 border-b border-gray-200">
+                    <span>ID_Transaksi</span>
+                    <span>Tanggal</span>
+                    <span>Jenis</span>
+                    <span>Id_Pesanan</span>
+                    <span>Total</span>
+                </div>
+
+                {{-- Rows --}}
+                @forelse($transaksi ?? [] as $item)
+                    <div class="grid grid-cols-5 text-sm text-gray-700 py-3 border-b border-gray-100 last:border-0">
+                        <span>#{{ $item->id }}</span>
+                        <span>{{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y') }}</span>
+                        <span>{{ $item->metode_pembayaran ?? '-' }}</span>
+                        <span>#{{ $item->id }}</span>
+                        <span>Rp {{ number_format($item->total, 0, ',', '.') }}</span>
+                    </div>
+                @empty
+                    <div class="grid grid-cols-5 text-sm text-gray-500 py-3 border-b border-gray-100">
+                        <span>#12345</span>
+                        <span>11-11-2026</span>
+                        <span></span>
+                        <span>#12345</span>
+                        <span></span>
+                    </div>
+                    <div class="grid grid-cols-5 text-sm text-gray-500 py-3">
+                        <span>#12387</span>
+                        <span>12-12-2026</span>
+                        <span></span>
+                        <span>#12387</span>
+                        <span></span>
+                    </div>
+                @endforelse
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('chartKeuangan').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                data: [130, 160, 155, 120, 110, 200],
+                borderColor: '#4a90d9',
+                backgroundColor: 'rgba(74,144,217,0.1)',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4,
+                fill: true,
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 } } }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
