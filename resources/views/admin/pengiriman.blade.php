@@ -21,13 +21,6 @@
     {{-- SIDEBAR --}}
     <x-sidebar/>
 
-        {{-- Admin --}}
-        <div class="flex items-center gap-3 px-4 py-4 border-t border-gray-200">
-            <div class="w-9 h-9 rounded-full bg-green-800 flex items-center justify-center text-white text-sm font-bold">A</div>
-            <span class="text-sm font-medium text-gray-700">Admin</span>
-        </div>
-    </div>
-
     {{-- MAIN --}}
     <div class="flex-1" style="margin-left: 220px;">
 

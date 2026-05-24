@@ -234,7 +234,7 @@ class OrderController extends Controller
         $riwayat[] = $order->id;
         session(['riwayat' => $riwayat]);
 
-        return redirect()->route('beranda', $order->id);
+        return redirect()->route('konfirmasi', $order->id)->with('success', 'Pesanan berhasil!');;
     }
 
     public function sukses($id)

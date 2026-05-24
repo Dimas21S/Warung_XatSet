@@ -140,4 +140,54 @@ class AdminController extends Controller
 
         return view('admin.produk', compact('totalProduk', 'totalTerjual', 'produk'));
     }
+
+    public function chartData(Request $request)
+    {
+        $filter = $request->filter ?? 'bulan';
+
+        if ($filter === 'tahun') {
+            // Per bulan dalam setahun
+            $data = Order::selectRaw('MONTH(created_at) as label, SUM(total) as total')
+                        ->whereYear('created_at', date('Y'))
+                        ->groupBy('label')
+                        ->orderBy('label')
+                        ->get()
+                        ->map(fn($item) => [
+                            'label' => \Carbon\Carbon::create()->month($item->label)->format('M'),
+                            'total' => $item->total
+                        ]);
+
+        } elseif ($filter === 'bulan') {
+            // Per minggu dalam sebulan
+            $data = Order::selectRaw('WEEK(created_at) as label, SUM(total) as total')
+                        ->whereYear('created_at', date('Y'))
+                        ->whereMonth('created_at', date('m'))
+                        ->groupBy('label')
+                        ->orderBy('label')
+                        ->get()
+                        ->map(fn($item) => [
+                            'label' => 'Minggu ' . ($item->label % 4 + 1),
+                            'total' => $item->total
+                        ]);
+
+        } else {
+            // Per tanggal dalam sebulan
+            $data = Order::selectRaw('DAY(created_at) as label, SUM(total) as total')
+                        ->whereYear('created_at', date('Y'))
+                        ->whereMonth('created_at', date('m'))
+                        ->groupBy('label')
+                        ->orderBy('label')
+                        ->get()
+                        ->map(fn($item) => [
+                            'label' => Carbon::create(
+                                now()->year,
+                                now()->month,
+                                $item->label
+                            )->translatedFormat('j F'),
+                            'total' => $item->total
+                        ]);
+        }
+
+        return response()->json($data)->header('Cache-Control', 'no-cache, no-store');
+    }
 }

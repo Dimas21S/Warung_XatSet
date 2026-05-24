@@ -104,9 +104,18 @@
                             <span class="font-semibold text-gray-700">Statistika Penjualan</span>
                         </div>
                         <div class="flex gap-1">
-                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Tahun</button>
-                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Bulan</button>
-                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Hari</button>
+                            <button id="btn-tahun" onclick="ambilData('tahun')"
+                                    class="btn-filter bg-gray-200 hover:bg-gray-300 text-gray-600 font-medium text-xs px-3 py-1.5 rounded-lg transition">
+                                Tahun
+                            </button>
+                            <button id="btn-bulan" onclick="ambilData('bulan')"
+                                    class="btn-filter bg-green-700 text-white font-medium text-xs px-3 py-1.5 rounded-lg transition">
+                                Bulan
+                            </button>
+                            <button id="btn-hari" onclick="ambilData('hari')"
+                                    class="btn-filter bg-gray-200 hover:bg-gray-300 text-gray-600 font-medium text-xs px-3 py-1.5 rounded-lg transition">
+                                Hari
+                            </button>
                         </div>
                     </div>
                     <canvas id="chartPenjualan" height="120"></canvas>
@@ -222,14 +231,16 @@
 
 <script>
     const ctx = document.getElementById('chartPenjualan').getContext('2d');
-    new Chart(ctx, {
+
+    let chart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: {!! json_encode($chartLabels) !!},
+            labels: [],
             datasets: [{
-                data: {!! json_encode($chartValues) !!},
-                backgroundColor: 'rgba(74,144,217,0.7)',
-                borderColor: '#4a90d9',
+                label: 'Total Penjualan',
+                data: [],
+                backgroundColor: 'rgba(45, 106, 79, 0.7)',
+                borderColor: '#2d6a4f',
                 borderWidth: 1,
                 borderRadius: 6,
             }]
@@ -238,10 +249,32 @@
             plugins: { legend: { display: false } },
             scales: {
                 x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-                y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 } }, beginAtZero: true }
+                y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 } } }
             }
         }
     });
+
+    // Load data awal
+    ambilData('bulan');
+
+    function ambilData(filter) {
+        // Ubah tampilan tombol aktif
+        document.querySelectorAll('.btn-filter').forEach(btn => {
+            btn.classList.remove('bg-green-700', 'text-white');
+            btn.classList.add('bg-gray-200', 'text-gray-600');
+        });
+        document.getElementById(`btn-${filter}`).classList.remove('bg-gray-200', 'text-gray-600');
+        document.getElementById(`btn-${filter}`).classList.add('bg-green-700', 'text-white');
+
+        // Ambil data dari controller
+        fetch(`{{ route('admin.chartData') }}?filter=${filter}&t=${Date.now()}`)
+    .then(res => res.json())
+    .then(data => {
+        chart.data.labels = data.map(item => item.label);
+        chart.data.datasets[0].data = data.map(item => item.total);
+        chart.update();
+    });
+    }
 </script>
 
 </body>

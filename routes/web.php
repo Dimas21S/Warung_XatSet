@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AdminController;
 
 Route::controller(AuthController::class)->group(function () {
     // Terkait dengan login
@@ -49,7 +50,7 @@ Route::controller(OrderController::class)->group(function () {
     Route::post('/checkout', 'postCheckout')->name('checkout.post');
 });
 
-Route::controller(App\Http\Controllers\AdminController::class)->group(function () {
+Route::controller(AdminController::class)->group(function () {
     Route::get('/admin/dashboard', 'dashboard')->name('admin.dashboard');
     Route::get('/admin/pesanan', 'pesanan')->name('admin.pesanan');
     Route::get('/admin/pengiriman', 'pengiriman')->name('admin.pengiriman');
@@ -57,4 +58,6 @@ Route::controller(App\Http\Controllers\AdminController::class)->group(function (
     Route::get('/admin/keuangan', 'keuangan')->name('admin.keuangan');
     Route::get('/admin/identitas', 'identitas')->name('admin.identitas');
     Route::get('/admin/diskon', 'diskon')->name('admin.diskon');
+
+    Route::get('/admin/chart-data', 'chartData')->name('admin.chartData');
 });

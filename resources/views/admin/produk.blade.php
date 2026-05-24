@@ -118,7 +118,7 @@
                         <span class="col-span-2">{{ $item->nama_menu }}</span>
                         <span>#{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</span>
                         <span>
-                            <span class="badge-kategori">{{ $item->kategori ?? 'Aneka Ikan' }}</span>
+                            <span class="badge-kategori">{{ $item->kategori->nama_kategori ?? 'Aneka Ikan' }}</span>
                         </span>
                         <span>{{ $item->stok ?? 100 }}</span>
                         <span class="{{ $item->is_available ? 'status-ada' : 'status-habis' }}">
