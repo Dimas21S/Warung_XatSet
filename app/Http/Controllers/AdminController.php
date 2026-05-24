@@ -26,19 +26,39 @@ class AdminController extends Controller
                     ->get();
 
         $produkTerlaris = OrderItem::with('menu')
-                        ->selectRaw('menu_id, SUM(qty) as total_terjual')
-                        ->groupBy('menu_id')
+                        ->selectRaw('menu_id, nama, SUM(qty) as total_terjual')
+                        ->groupBy('menu_id', 'nama')
                         ->orderByDesc('total_terjual')
                         ->take(5)
+                        ->get(['menu_id', 'nama', 'total_terjual']);
+
+
+         // Data chart per bulan
+        $chartData = OrderItem::selectRaw('MONTH(order_items.created_at) as bulan, SUM(qty) as total')
+                        ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                        ->whereYear('order_items.created_at', date('Y'))
+                        ->groupBy('bulan')
+                        ->orderBy('bulan')
                         ->get();
 
+        // Format jadi array 12 bulan
+        $chartLabels = [];
+        $chartValues = [];
+        $namaBulan = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+        for ($i = 1; $i <= 12; $i++) {
+            $chartLabels[] = $namaBulan[$i - 1];
+            $found = $chartData->firstWhere('bulan', $i);
+            $chartValues[] = $found ? $found->total : 0;
+        }
         return view('admin.dashboard', compact(
             'totalPenjualan',
             'totalPesanan',
             'totalKeuntungan',
             'pesananTerbaru',
-            'produkTerlaris'
+            'produkTerlaris',
+            'chartLabels',
+            'chartValues',
         ));
     }
 

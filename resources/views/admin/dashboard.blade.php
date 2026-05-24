@@ -31,32 +31,7 @@
 <div class="flex">
 
     {{-- SIDEBAR --}}
-    <div class="sidebar flex flex-col justify-between" style="position: fixed; top:0; left:0; height:100vh;">
-        <div>
-            {{-- Logo --}}
-            <div class="flex items-center gap-2 px-4 py-4 border-b border-gray-200">
-                <img src="{{ asset('image/Logo-Xatset.png') }}" alt="Logo" class="h-10 w-10 rounded-full object-cover">
-                <span class="font-bold text-green-800 text-sm leading-tight">WARUNG XAT SET</span>
-            </div>
-
-            {{-- Nav --}}
-            <nav class="mt-4">
-                <a href="#"  class="sidebar-link active">Dashboard</a>
-                <a href="#" class="sidebar-link">Pesanan</a>
-                <a href="#"  class="sidebar-link">Pengiriman</a>
-                <a href="#" class="sidebar-link">Produk</a>
-                <a href="#" class="sidebar-link">Keuangan</a>
-                <a href="#"  class="sidebar-link">Identitas</a>
-                <a href="#" class="sidebar-link">Diskon</a>
-            </nav>
-        </div>
-
-        {{-- Admin --}}
-        <div class="flex items-center gap-3 px-4 py-4 border-t border-gray-200">
-            <div class="w-9 h-9 rounded-full bg-green-800 flex items-center justify-center text-white text-sm font-bold">A</div>
-            <span class="text-sm font-medium text-gray-700">Admin</span>
-        </div>
-    </div>
+    <x-sidebar/>
 
     {{-- MAIN --}}
     <div class="flex-1" style="margin-left: 220px;">
@@ -129,9 +104,9 @@
                             <span class="font-semibold text-gray-700">Statistika Penjualan</span>
                         </div>
                         <div class="flex gap-1">
-                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">−</button>
-                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">+</button>
-                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">−</button>
+                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Tahun</button>
+                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Bulan</button>
+                            <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Hari</button>
                         </div>
                     </div>
                     <canvas id="chartPenjualan" height="120"></canvas>
@@ -156,9 +131,8 @@
                         <tbody>
                             @forelse($produkTerlaris ?? [] as $produk)
                                 <tr class="border-t border-gray-100">
-                                    <td class="py-2 text-gray-700">{{ $produk->nama_menu }}</td>
+                                    <td class="py-2 text-blue-700">{{ $produk->nama }}</td>
                                     <td class="py-2 text-gray-700">{{ $produk->total_terjual }}</td>
-                                    <td class="py-2"><span class="checkbox-fake"></span></td>
                                 </tr>
                             @empty
                                 <tr class="border-t border-gray-100">
@@ -192,7 +166,7 @@
                         </svg>
                         <span class="font-semibold text-gray-700">Grafik Pemasukan</span>
                     </div>
-                    <a href="#" class="text-sm text-green-600 hover:underline">Tampilkan Semua</a>
+                    <a href="{{ route('admin.pesanan') }}" class="text-sm text-green-600 hover:underline">Tampilkan Semua</a>
                 </div>
 
                 <table class="w-full text-sm">
@@ -247,27 +221,24 @@
 </div>
 
 <script>
-    // Chart Penjualan
     const ctx = document.getElementById('chartPenjualan').getContext('2d');
     new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: {!! json_encode($chartLabels) !!},
             datasets: [{
-                data: [120, 190, 170, 210, 240, 260],
+                data: {!! json_encode($chartValues) !!},
+                backgroundColor: 'rgba(74,144,217,0.7)',
                 borderColor: '#4a90d9',
-                backgroundColor: 'rgba(74,144,217,0.1)',
-                borderWidth: 2,
-                pointRadius: 0,
-                tension: 0.4,
-                fill: true,
+                borderWidth: 1,
+                borderRadius: 6,
             }]
         },
         options: {
             plugins: { legend: { display: false } },
             scales: {
                 x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-                y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 } } }
+                y: { grid: { color: '#f0f0f0' }, ticks: { font: { size: 11 } }, beginAtZero: true }
             }
         }
     });

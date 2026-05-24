@@ -17,7 +17,7 @@
 
     </div>
 
-    <div class="flex flex-col items-center mt-6 px-2 gap-4">
+    <div class="flex flex-col items-center mt-6 px-2 gap-4" id="cart-container">
         @forelse ($cart as $index => $item )
             <div class="max-w-lg w-full flex border border-gray-200 rounded-xl overflow-hidden bg-[rgba(217,234,226,1)] mt-6" id="card-{{ $index }}">
                 {{-- Gambar kiri --}}
@@ -79,91 +79,108 @@
                 </div>
             </div>
         @empty
-            <div class="text-center py-12 text-gray-400 text-sm">
+            <div class="text-center py-12 text-gray-400 text-sm" id="empty-cart">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.6 8M7 13h10m0 0l1.6 8M17 21a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/>
+                </svg>
                 Keranjang kosong.
             </div>
         @endforelse
     </div>
+
+    {{-- Empty cart untuk JS (hanya muncul jika cart tidak kosong di awal) --}}
+    @if(count($cart) > 0)
+        <div id="empty-cart" class="hidden text-center py-16">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.6 8M7 13h10m0 0l1.6 8M17 21a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/>
+            </svg>
+            <p class="text-gray-400 font-medium text-lg">Keranjang kosong</p>
+            <p class="text-gray-300 text-sm mt-1">Yuk tambahkan menu dulu!</p>
+            <a href="{{ route('produk') }}" class="inline-block mt-4 bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg text-sm transition">
+                Lihat Menu
+            </a>
+        </div>
+    @endif
 
     {{-- Hitung total --}}
     @php
         $total = collect($cart)->sum(fn($item) => $item['harga'] * $item['qty']);
     @endphp
 
-    <button class="fixed bottom-5 right-5 bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-lg font-medium transition" onclick="window.location.href='{{ route('konfirmasi') }}'">
+    <button id="tombol-total" class="fixed bottom-5 right-5 bg-green-700 hover:bg-green-800 text-white px-6 py-3 rounded-lg font-medium transition" onclick="window.location.href='{{ route('konfirmasi') }}'">
         Total: <span id="total-harga">IDR {{ number_format($total, 0, ',', '.') }}</span>
     </button>
 
 <script>
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-    function tambahQty(index, btn) {
-        fetch('{{ route('keranjang.tambah') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ index: index })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Update angka qty
-                document.getElementById(`qty-${index}`).textContent = data.qty;
-
-                // Update total harga
-                document.getElementById('total-harga').textContent = 'IDR ' + formatRupiah(data.total);
-            }
-        });
+function cekKeranjangKosong() {
+    const cards = document.querySelectorAll('[id^="card-"]');
+    if (cards.length === 0) {
+        document.getElementById('tombol-total').classList.add('hidden');
+        document.getElementById('empty-cart').classList.remove('hidden');
     }
+}
 
-    function kurangQty(index, btn) {
-        fetch('{{ route('keranjang.kurang') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ index: index })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'hapus') {
-                // Hapus card dari tampilan
-                document.getElementById(`card-${index}`).remove();
-            } else {
-                // Update angka qty
-                document.getElementById(`qty-${index}`).textContent = data.qty;
-            }
-
-            // Update total harga
+function tambahQty(index, btn) {
+    fetch('{{ route('keranjang.tambah') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ index: index })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            document.getElementById(`qty-${index}`).textContent = data.qty;
             document.getElementById('total-harga').textContent = 'IDR ' + formatRupiah(data.total);
-        });
-    }
+        }
+    });
+}
 
-    function hapusItem(index, btn) {
-        fetch('{{ route('keranjang.hapus') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ index: index })
-        })
-        .then(res => res.json())
-        .then(data => {
-            // Hapus card dari tampilan
+function kurangQty(index, btn) {
+    fetch('{{ route('keranjang.kurang') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ index: index })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'hapus') {
             document.getElementById(`card-${index}`).remove();
+            cekKeranjangKosong();
+        } else {
+            document.getElementById(`qty-${index}`).textContent = data.qty;
+        }
+        document.getElementById('total-harga').textContent = 'IDR ' + formatRupiah(data.total);
+    });
+}
 
-            // Update total harga
-            document.getElementById('total-harga').textContent = 'IDR ' + formatRupiah(data.total);
-        });
-    }
+function hapusItem(index, btn) {
+    fetch('{{ route('keranjang.hapus') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ index: index })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById(`card-${index}`).remove();
+        document.getElementById('total-harga').textContent = 'IDR ' + formatRupiah(data.total);
+        cekKeranjangKosong();
+    });
+}
 
-    function formatRupiah(angka) {
-        return angka.toLocaleString('id-ID');
-    }
+function formatRupiah(angka) {
+    return angka.toLocaleString('id-ID');
+}
 </script>
 </body>
     <script>

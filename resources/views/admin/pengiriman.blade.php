@@ -19,25 +19,7 @@
 <div class="flex">
 
     {{-- SIDEBAR --}}
-    <div class="sidebar flex flex-col justify-between" style="position: fixed; top:0; left:0; height:100vh;">
-        <div>
-            {{-- Logo --}}
-            <div class="flex items-center gap-2 px-4 py-4 border-b border-gray-200">
-                <img src="{{ asset('image/Logo-Xatset.png') }}" alt="Logo" class="h-10 w-10 rounded-full object-cover">
-                <span class="font-bold text-green-800 text-sm leading-tight">WARUNG XAT SET</span>
-            </div>
-
-            {{-- Nav --}}
-            <nav class="mt-4">
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-link">Dashboard</a>
-                <a href="#" class="sidebar-link">Pesanan</a>
-                <a href="#" class="sidebar-link active">Pengiriman</a>
-                <a href="#" class="sidebar-link">Produk</a>
-                <a href="#" class="sidebar-link">Keuangan</a>
-                <a href="#" class="sidebar-link">Identitas</a>
-                <a href="#" class="sidebar-link">Diskon</a>
-            </nav>
-        </div>
+    <x-sidebar/>
 
         {{-- Admin --}}
         <div class="flex items-center gap-3 px-4 py-4 border-t border-gray-200">

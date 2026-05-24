@@ -229,7 +229,18 @@ class OrderController extends Controller
         // Kosongkan cart
         session()->forget('cart');
 
+        // Simpan order_id ke session riwayat
+        $riwayat = session('riwayat', []);
+        $riwayat[] = $order->id;
+        session(['riwayat' => $riwayat]);
+
         return redirect()->route('beranda', $order->id);
+    }
+
+    public function sukses($id)
+    {
+        $order = Order::with('items')->findOrFail($id);
+        return view('user.riwayat', compact('order'));
     }
 
 }

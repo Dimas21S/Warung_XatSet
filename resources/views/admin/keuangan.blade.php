@@ -21,27 +21,7 @@
 <div class="flex">
 
     {{-- SIDEBAR --}}
-    <div class="sidebar flex flex-col justify-between" style="position: fixed; top:0; left:0; height:100vh;">
-        <div>
-            <div class="flex items-center gap-2 px-4 py-4 border-b border-gray-200">
-                <img src="{{ asset('image/Logo-Xatset.png') }}" alt="Logo" class="h-10 w-10 rounded-full object-cover">
-                <span class="font-bold text-green-800 text-sm leading-tight">WARUNG XAT SET</span>
-            </div>
-            <nav class="mt-4">
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-link">Dashboard</a>
-                <a href="#" class="sidebar-link">Pesanan</a>
-                <a href="#" class="sidebar-link">Pengiriman</a>
-                <a href="#" class="sidebar-link">Produk</a>
-                <a href="#" class="sidebar-link active">Keuangan</a>
-                <a href="#" class="sidebar-link">Identitas</a>
-                <a href="#" class="sidebar-link">Diskon</a>
-            </nav>
-        </div>
-        <div class="flex items-center gap-3 px-4 py-4 border-t border-gray-200">
-            <div class="w-9 h-9 rounded-full bg-green-800 flex items-center justify-center text-white text-sm font-bold">A</div>
-            <span class="text-sm font-medium text-gray-700">Admin</span>
-        </div>
-    </div>
+    <x-sidebar/>
 
     {{-- MAIN --}}
     <div class="flex-1" style="margin-left: 220px;">
@@ -84,9 +64,9 @@
                         <span class="font-semibold text-gray-700">Statistika Penjualan</span>
                     </div>
                     <div class="flex gap-1">
-                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">−</button>
-                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">+</button>
-                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">−</button>
+                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Tahun</button>
+                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Bulan</button>
+                        <button class="w-7 h-7 bg-gray-200 rounded text-gray-600 font-bold text-sm hover:bg-gray-300">Hari</button>
                     </div>
                 </div>
                 <canvas id="chartKeuangan" height="80"></canvas>
