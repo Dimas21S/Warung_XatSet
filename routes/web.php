@@ -57,7 +57,21 @@ Route::controller(AdminController::class)->group(function () {
     Route::get('/admin/produk', 'produk')->name('admin.produk');
     Route::get('/admin/keuangan', 'keuangan')->name('admin.keuangan');
     Route::get('/admin/identitas', 'identitas')->name('admin.identitas');
-    Route::get('/admin/diskon', 'diskon')->name('admin.diskon');
+    // Route::get('/admin/diskon', 'diskon')->name('admin.diskon');
+
+    Route::get('/admin/pesanan/{id}/detail', [AdminController::class, 'detailPesanan'])->name('admin.pesanan.detail');
+    Route::post('/admin/pesanan/{id}/status', [AdminController::class, 'updateStatus'])->name('admin.pesanan.status');
+
+    Route::get('/admin/produk/tambah', [AdminController::class, 'tambahProduk'])->name('admin.produk.tambah');
+    Route::post('/admin/produk/store', [AdminController::class, 'storeProduk'])->name('admin.produk.store');
+
+    Route::get('/admin/produk/{id}/edit', [AdminController::class, 'editProduk'])->name('admin.produk.edit');
+    Route::put('/admin/produk/{id}/update', [AdminController::class, 'updateProduk'])->name('admin.produk.update');
+
+    Route::delete('/admin/produk/{id}/hapus', [AdminController::class, 'hapusProduk'])->name('admin.produk.hapus');
+
+    Route::put('/admin/identitas/update', [AdminController::class, 'updateIdentitas'])->name('admin.identitas.update');
+    Route::put('/admin/identitas/media', [AdminController::class, 'updateMedia'])->name('admin.identitas.media');
 
     Route::get('/admin/chart-data', 'chartData')->name('admin.chartData');
 });

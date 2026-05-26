@@ -95,7 +95,7 @@
                         </svg>
                         <span class="font-semibold text-gray-700">Daftar</span>
                     </div>
-                    <a href="#">
+                    <a href="{{ route('admin.produk.tambah') }}">
                         <button class="tambah-btn">Tambah</button>
                     </a>
                 </div>
@@ -104,11 +104,11 @@
                 <div class="grid grid-cols-8 text-sm text-gray-500 font-medium pb-2 border-b border-gray-300">
                     <span>No</span>
                     <span class="col-span-2">Nama_Produk</span>
-                    <span>Id_produk</span>
                     <span>Kategori</span>
                     <span>Stok</span>
                     <span>Status</span>
                     <span>Foto</span>
+                    <span>Aksi</span>
                 </div>
 
                 {{-- Rows --}}
@@ -116,7 +116,7 @@
                     <div class="grid grid-cols-8 text-sm text-gray-700 py-3 border-b border-gray-200 last:border-0 items-center">
                         <span>{{ $index + 1 }}</span>
                         <span class="col-span-2">{{ $item->nama_menu }}</span>
-                        <span>#{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</span>
+                        {{-- <span>#{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}</span> --}}
                         <span>
                             <span class="badge-kategori">{{ $item->kategori->nama_kategori ?? 'Aneka Ikan' }}</span>
                         </span>
@@ -132,6 +132,17 @@
                                 <img src="{{ asset('image/makanan.jpg') }}" class="w-12 h-12 object-cover rounded-lg">
                             @endif
                         </span>
+                        {{-- Di kolom Aksi tabel produk --}}
+                        <a href="{{ route('admin.produk.edit', $item->id) }}">
+                            <button class="bg-blue-100 text-blue-700 border-none px-3 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-blue-200 transition">
+                                Edit
+                            </button>
+                        </a>
+
+                        <button type="button" onclick="bukaHapus({{ $item->id }})"
+                                class="bg-red-100 text-red-700 border-none px-3 py-1 rounded-lg text-xs font-medium cursor-pointer hover:bg-red-200 transition">
+                            Hapus
+                        </button>
                     </div>
                 @empty
                     <div class="grid grid-cols-8 text-sm text-gray-500 py-3 items-center">
@@ -154,5 +165,67 @@
     </div>
 </div>
 
+{{-- Popup Konfirmasi Hapus --}}
+<div id="popup-hapus" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+    <div onclick="tutupHapus()" class="absolute inset-0 bg-opacity-40"></div>
+    <div id="popup-hapus-card" class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 z-10 text-center"
+         style="transform: scale(0.8); transition: transform 0.3s ease; opacity: 0;">
+
+        {{-- Icon --}}
+        <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+        </div>
+
+        <p class="font-bold text-gray-800 text-lg mb-2">Hapus Produk?</p>
+        <p class="text-gray-500 text-sm mb-6">Produk yang dihapus tidak dapat dikembalikan.</p>
+
+        <div class="flex gap-3">
+            <button onclick="tutupHapus()"
+                    class="flex-1 border border-gray-300 text-gray-600 py-2 rounded-xl hover:bg-gray-50 transition font-medium">
+                Batal
+            </button>
+            <form id="form-hapus" method="POST">
+                @csrf
+                @method('DELETE')
+                <button type="submit"
+                        class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-xl transition font-medium">
+                    Hapus
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+function bukaHapus(id) {
+    const popup = document.getElementById('popup-hapus');
+    const card  = document.getElementById('popup-hapus-card');
+    const form  = document.getElementById('form-hapus');
+
+    // Set action form sesuai id produk
+    form.action = `/admin/produk/${id}/hapus`;
+
+    popup.classList.remove('hidden');
+    setTimeout(() => {
+        card.style.transform = 'scale(1)';
+        card.style.opacity   = '1';
+    }, 10);
+}
+
+function tutupHapus() {
+    const popup = document.getElementById('popup-hapus');
+    const card  = document.getElementById('popup-hapus-card');
+
+    card.style.transform = 'scale(0.8)';
+    card.style.opacity   = '0';
+    setTimeout(() => {
+        popup.classList.add('hidden');
+    }, 300);
+}
+</script>
 </body>
 </html>

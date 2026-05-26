@@ -47,90 +47,104 @@
 
             {{-- Form Identitas --}}
             <div class="bg-white rounded-xl p-6 shadow-sm">
-                <form action="#" method="POST">
-                    @csrf
-                    @method('PUT')
+                {{-- Notif Identitas --}}
+                @if(session('success_identitas'))
+                    <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg text-sm">
+                        {{ session('success_identitas') }}
+                    </div>
+                @endif
 
-                    <div class="grid grid-cols-2 gap-4">
+                {{-- Form Identitas --}}
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <form action="{{ route('admin.identitas.update') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
 
-                        {{-- Kiri --}}
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Nama Aplikasi</label>
-                                <input type="text" name="nama_aplikasi" class="input-field" value="{{ $setting->nama_aplikasi ?? '' }}">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Nama Aplikasi</label>
+                                    <input type="text" name="nama_aplikasi" class="input-field" value="{{ $setting->nama_aplikasi ?? '' }}">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Alamat</label>
+                                    <textarea name="alamat" class="input-field" rows="2">{{ $setting->alamat ?? '' }}</textarea>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Logo</label>
+                                    <input type="file" name="logo" accept="image/*" class="input-field">
+                                </div>
                             </div>
-                            <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Logo</label>
-                                <input type="text" name="logo" class="input-field" value="{{ $setting->logo ?? '' }}">
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Alamat</label>
-                                <input type="text" name="alamat" class="input-field" value="{{ $setting->alamat ?? '' }}">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">No CS</label>
+                                    <input type="text" name="no_cs" class="input-field" value="{{ $setting->no_cs ?? '' }}">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Outlet</label>
+                                    <select name="outlet_id" class="input-field">
+                                        <option value="">-- Pilih Outlet --</option>
+                                        @foreach($outlets as $outlet)
+                                            <option value="{{ $outlet->id }}" {{ ($setting->outlet_id ?? '') == $outlet->id ? 'selected' : '' }}>
+                                                {{ $outlet->nama }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Kanan --}}
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-xs text-gray-500 mb-1 block">No CS / Whatsapp</label>
-                                <input type="text" name="no_cs" class="input-field" value="{{ $setting->no_cs ?? '' }}">
-                            </div>
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" class="edit-btn">Simpan</button>
                         </div>
-
-                    </div>
-
-                    <div class="flex justify-end mt-4">
-                        <button type="submit" class="edit-btn">Simpan</button>
-                    </div>
-
-                </form>
+                    </form>
+                </div>
             </div>
 
             {{-- Form Media --}}
             <div class="bg-white rounded-xl p-6 shadow-sm">
-                <form action="#" method="POST">
-                    @csrf
-                    @method('PUT')
+                {{-- Notif Media --}}
+                @if(session('success_media'))
+                    <div class="bg-green-100 text-green-700 px-4 py-3 rounded-lg text-sm">
+                        {{ session('success_media') }}
+                    </div>
+                @endif
 
-                    <p class="font-semibold text-gray-700 mb-4">Media</p>
+                {{-- Form Media --}}
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <form action="{{ route('admin.identitas.media') }}" method="POST">
+                        @csrf
+                        @method('PUT')
 
-                    <div class="grid grid-cols-2 gap-x-8 gap-y-4">
-
-                        {{-- Kiri --}}
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-3">
-                                <label class="text-sm text-gray-600 w-20">Facebook</label>
-                                <input type="text" name="facebook" class="input-field" value="{{ $setting->facebook ?? '' }}">
+                        <p class="font-semibold text-gray-700 mb-4">Media</p>
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-4">
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <label class="text-sm text-gray-600 w-20">Facebook</label>
+                                    <input type="text" name="facebook" class="input-field" value="{{ $setting->facebook ?? '' }}">
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <label class="text-sm text-gray-600 w-20">Instagram</label>
+                                    <input type="text" name="instagram" class="input-field" value="{{ $setting->instagram ?? '' }}">
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <label class="text-sm text-gray-600 w-20">Twitter</label>
+                                    <input type="text" name="twitter" class="input-field" value="{{ $setting->twitter ?? '' }}">
+                                </div>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <label class="text-sm text-gray-600 w-20">Instagram</label>
-                                <input type="text" name="instagram" class="input-field" value="{{ $setting->instagram ?? '' }}">
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <label class="text-sm text-gray-600 w-20">Twitter</label>
-                                <input type="text" name="twitter" class="input-field" value="{{ $setting->twitter ?? '' }}">
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <label class="text-sm text-gray-600 w-20">Whatsapp</label>
+                                    <input type="text" name="whatsapp" class="input-field" value="{{ $setting->whatsapp ?? '' }}">
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Kanan --}}
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-3">
-                                <label class="text-sm text-gray-600 w-20">Wa</label>
-                                <input type="text" name="whatsapp" class="input-field" value="{{ $setting->whatsapp ?? '' }}">
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <label class="text-sm text-gray-600 w-20">Hp</label>
-                                <input type="text" name="hp" class="input-field" value="{{ $setting->hp ?? '' }}">
-                            </div>
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" class="edit-btn">Simpan</button>
                         </div>
-
-                    </div>
-
-                    <div class="flex justify-end mt-4">
-                        <button type="submit" class="edit-btn">Simpan</button>
-                    </div>
-
-                </form>
+                    </form>
+                </div>
             </div>
 
         </div>

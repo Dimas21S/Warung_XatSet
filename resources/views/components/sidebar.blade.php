@@ -33,7 +33,7 @@
                class="sidebar-link {{ request()->routeIs('admin.identitas*') ? 'active' : '' }}">
                Identitas
             </a>
-            <a href="{{ route('admin.diskon') }}"
+            <a href="#"
                class="sidebar-link {{ request()->routeIs('admin.diskon*') ? 'active' : '' }}">
                Diskon
             </a>

@@ -55,7 +55,7 @@
                     <span>ID_Pesanan</span>
                     <span>Nama_Pelanggan</span>
                     <span>Waktu Mulai</span>
-                    <span>Waktu Selesai</span>
+                    {{-- <span>Waktu Selesai</span> --}}
                     <span>Harga</span>
                 </div>
 
@@ -65,7 +65,7 @@
                         <span>#{{ $item->id }}</span>
                         <span>{{ $item->nama_penerima ?? '-' }}</span>
                         <span>{{ $item->waktu_pengiriman ?? '-' }}</span>
-                        <span>{{ $item->waktu_selesai ?? '-' }}</span>
+                        {{-- <span>{{ $item->waktu_selesai ?? '-' }}</span> --}}
                         <span>Rp {{ number_format($item->total, 0, ',', '.') }}</span>
                     </div>
                 @empty
